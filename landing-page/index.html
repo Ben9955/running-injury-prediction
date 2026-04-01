@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSc Thesis | Running Injury Prediction System</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <section class="hero">
+      <div class="container">
+        <div class="badge">BSc Computer Science Final Year Project • 2026</div>
+        <h1>Predicting Overuse Injuries in Runners</h1>
+        <p>
+          A machine learning approach using Apple Watch training load data and
+          XGBoost to identify injury risk patterns.
+        </p>
+
+        <div class="video-container">
+          <iframe
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+            title="Project Demonstration"
+            allow="
+              accelerometer;
+              autoplay;
+              clipboard-write;
+              encrypted-media;
+              gyroscope;
+              picture-in-picture;
+            "
+            allowfullscreen
+          >
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <section class="architecture">
+      <div class="container">
+        <h2>System Implementation</h2>
+        <p class="intro">
+          Workouts are synced via HealthKit, processed in the mobile app, and
+          sent to a FastAPI backend for analysis.
+        </p>
+
+        <div class="pipeline">
+          <div class="pipeline-step">
+            <i class="fa-brands fa-apple"></i>
+            <h3>Data Collection</h3>
+            <p>
+              Extracts 12 weeks of historical workout data (distance, HR,
+              frequency) via Apple HealthKit.
+            </p>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="pipeline-step">
+            <i class="fa-brands fa-react"></i>
+            <h3>Mobile Client</h3>
+            <p>
+              React Native application handles user authentication and initial
+              data formatting for the API.
+            </p>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="pipeline-step">
+            <i class="fa-brands fa-python"></i>
+            <h3>Feature Engineering</h3>
+            <p>
+              Python backend calculates 12 predictive features (ACWR, Monotony,
+              Z-Scores) from the 12-week history.
+            </p>
+          </div>
+
+          <div class="arrow">→</div>
+
+          <div class="pipeline-step">
+            <i class="fa-solid fa-brain"></i>
+            <h3>XGBoost Inference</h3>
+            <p>
+              A trained Gradient Boosting model predicts the probability of
+              injury based on the engineered features.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="background-color: #0a1929; padding: 60px 0">
+      <div class="container">
+        <h2 style="text-align: center; margin-bottom: 40px">
+          System Interface
+        </h2>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+          "
+        >
+          <div
+            style="
+              flex: 1;
+              min-width: 200px;
+              max-width: 260px;
+              text-align: center;
+            "
+          >
+            <img
+              src="assets/dashboard_screen.png"
+              alt="Dashboard"
+              style="
+                width: 100%;
+                height: auto;
+                border-radius: 15px;
+                border: 3px solid #1d3557;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+              "
+            />
+            <p style="margin-top: 15px; color: #a8dadc; font-size: 0.95rem">
+              <strong>Risk Analysis</strong><br />Real-time metrics
+            </p>
+          </div>
+
+          <div
+            style="
+              flex: 1;
+              min-width: 200px;
+              max-width: 260px;
+              text-align: center;
+            "
+          >
+            <img
+              src="assets/sync_screen.png"
+              alt="HealthKit Sync"
+              style="
+                width: 100%;
+                height: auto;
+                border-radius: 15px;
+                border: 3px solid #1d3557;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+              "
+            />
+            <p style="margin-top: 15px; color: #a8dadc; font-size: 0.95rem">
+              <strong>Data Integration</strong><br />HealthKit sync
+            </p>
+          </div>
+
+          <div
+            style="
+              flex: 1;
+              min-width: 200px;
+              max-width: 260px;
+              text-align: center;
+            "
+          >
+            <img
+              src="assets/advice_screen.png"
+              alt="AI Recommendations"
+              style="
+                width: 100%;
+                height: auto;
+                border-radius: 15px;
+                border: 3px solid #1d3557;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+              "
+            />
+            <p style="margin-top: 15px; color: #a8dadc; font-size: 0.95rem">
+              <strong>LLM Advice</strong><br />Personalized recovery
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="container">
+        <h2>Development Key Features</h2>
+        <p class="intro">
+          The project focuses on transforming raw GPS and Heart Rate data into
+          commonly used training metrics from sports science literature.
+        </p>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <i class="fa-solid fa-sync-alt"></i>
+            <h3>HealthKit Integration</h3>
+            <p>
+              Developed using <code>react-native-healthkit</code> to pull 12
+              weeks of training. I implemented filters to ensure only running
+              data is analyzed to maintain model accuracy.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <i class="fa-solid fa-chart-line"></i>
+            <h3>Workload Calculations</h3>
+            <p>
+              Implemented the Acute:Chronic Workload Ratio (ACWR). The system
+              detects training "spikes" by comparing the current 7 days against
+              a 28-day baseline.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <i class="fa-solid fa-robot"></i>
+            <h3>LLM Feedback Loop</h3>
+            <p>
+              Integrated a language model (Gemini 2.5 flash lite) to translate
+              model outputs into advice. I used prompt engineering to ensure the
+              AI considers the specific risk factors found in the training data.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <i class="fa-solid fa-database"></i>
+            <h3>Backend Pipeline</h3>
+            <p>
+              The FastAPI backend performs feature engineering. It uses rolling
+              windows and expanding medians to create a personalized training
+              baseline for each user.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <i class="fa-solid fa-shield-alt"></i>
+            <h3>Model Optimization</h3>
+            <p>
+              Used an XGBoost classifier with L1/L2 regularization to manage the
+              small dataset size and prevent overfitting during the training
+              phase.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <i class="fa-solid fa-mobile-alt"></i>
+            <h3>State Management</h3>
+            <p>
+              Uses React Context and AsyncStorage. The system is designed to be
+              "local-first," storing prediction history on the device rather
+              than a remote database.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <p><strong>BSc Computer Science Thesis Project</strong></p>
+        <p>
+          Developed by <strong>Ben Salem El Ansari</strong> | Middlesex
+          University
+        </p>
+        <p style="font-size: 0.9rem; color: #6c7a89; margin-top: 10px">
+          Supervised by Dr. David Gamez
+        </p>
+
+        <div class="github-links">
+          <a href="https://github.com/yourusername/frontend" target="_blank"
+            >Frontend Repository</a
+          >
+          <a href="https://github.com/yourusername/backend" target="_blank"
+            >Backend Repository</a
+          >
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
