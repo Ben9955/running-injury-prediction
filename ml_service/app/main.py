@@ -12,6 +12,7 @@ from app.core.engineering import engineer_all_features, get_final_features
 from dotenv import load_dotenv
 
 load_dotenv()
+
 client = genai.Client()
 
 app = FastAPI(title="Injury Prediction API")
@@ -58,8 +59,8 @@ class PredictionResponse(BaseModel):
     key_factors: Dict[str, float]
     recommendations: List[str]
 
+# Using LLM to turn raw numbers into readable coaching advice
 async def generate_recommendations(risk_percent, risk_level, metrics, history_text, total_kms_current):
-    # Using LLM to turn raw numbers into readable coaching advice
     is_beginner = total_kms_current < 5.0
     
     # Custom instruction for the AI if the runner is low volume
@@ -82,7 +83,8 @@ async def generate_recommendations(risk_percent, risk_level, metrics, history_te
             config={'response_mime_type': 'application/json'}
         )
         return json.loads(response.text).get("advice", ["Stay consistent", "Rest well", "Monitor pain"])
-    except:
+    except Exception as e:
+        print("GEMINI ERROR:", str(e))
         return ["Rest well", "Keep moving", "Watch for pain"]
 
 
