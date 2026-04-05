@@ -22,8 +22,8 @@ body {
 /* Hero Section */
 .hero {
   background: linear-gradient(135deg, #1d3557 0%, #0a1929 100%);
-  padding: 100px 0 80px; /* Adjusted padding */
-  text-align: left; /* Changed from center */
+  padding: 100px 0 80px; 
+  text-align: left;
   border-bottom: 3px solid #e76f51;
   overflow: hidden;
 }
