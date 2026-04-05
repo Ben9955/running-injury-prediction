@@ -27,20 +27,24 @@ body {
   border-bottom: 3px solid #e76f51;
 }
 
-.hero h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: #ffffff;
+.hero {
+  background: linear-gradient(135deg, #1d3557 0%, #0a1929 100%);
+  padding: 100px 0 80px; /* Adjusted padding */
+  text-align: left; /* Changed from center */
+  border-bottom: 3px solid #e76f51;
+  overflow: hidden;
 }
 
-.hero p {
-  font-size: 1.2rem;
-  color: #a8dadc;
-  margin-bottom: 40px;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
+.hero-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.hero-text {
+  flex: 1;
+  max-width: 600px;
 }
 
 .hero .badge {
@@ -51,27 +55,36 @@ body {
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
-.video-container {
-  max-width: 800px;
-  margin: 0 auto;
-  position: relative;
-  padding-bottom: 45%; /* 16:9 aspect ratio */
-  height: 0;
-  overflow: hidden;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+.hero h1 {
+  font-size: 3rem; /* Slightly larger for the split view */
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #ffffff;
+  line-height: 1.2;
 }
 
-.video-container iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
+.hero p {
+  font-size: 1.2rem;
+  color: #a8dadc;
+  margin-bottom: 0; /* Removed margin auto since it's not centered anymore */
+  max-width: 100%;
+}
+
+.hero-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-image img {
   width: 100%;
-  height: 100%;
-  border: none;
+  max-width: 500px;
+  border-radius: 15px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(231, 111, 81, 0.3); /* Subtle orange glow */
 }
 
 /* Section Styles */
@@ -373,7 +386,17 @@ footer a:hover {
     }
 }
 
-
+@media (max-width: 992px) {
+  .hero-container {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .hero-image img {
+    max-width: 100%;
+    margin-top: 30px;
+  }
+}
 
 
 
