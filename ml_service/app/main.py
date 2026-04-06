@@ -14,22 +14,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 client = genai.Client()
-
 app = FastAPI(title="Injury Prediction API")
 
 trained_model = None
 model_features = None
 
+
 @app.on_event("startup")
 async def load_model_assets():
-    # Load the pickle file and features at startup so we don't do it on every request
     global trained_model, model_features
     try:
         trained_model = joblib.load("app/models/injury_model.pkl")
         model_features = get_final_features()
-        print("Backend Ready: Model and features loaded.")
+        print("Backend ready: model and features loaded.")
     except Exception as e:
         print(f"Startup error: {e}")
+
 
 class TrainingWeek(BaseModel):
     date: int
@@ -49,9 +49,11 @@ class TrainingWeek(BaseModel):
     max_km_one_day_1: float
     max_km_one_day_2: float
 
+
 class PredictionRequest(BaseModel):
     athlete_id: int
     training_history: List[TrainingWeek]
+
 
 class PredictionResponse(BaseModel):
     injury_risk_percent: float
@@ -59,20 +61,26 @@ class PredictionResponse(BaseModel):
     key_factors: Dict[str, float]
     recommendations: List[str]
 
-# Using LLM to turn raw numbers into readable coaching advice
+
 async def generate_recommendations(risk_percent, risk_level, metrics, history_text, total_kms_current):
     is_beginner = total_kms_current < 5.0
-    
-    # Custom instruction for the AI if the runner is low volume
-    context = "Athlete is a beginner (<5km). Focus on base building, ignore tiny spikes." if is_beginner else ""
+
+    context = (
+        "Athlete is a beginner (<5km/week). Focus on base building and ignore small load changes."
+        if is_beginner else ""
+    )
 
     prompt = f"""
-    Role: Running Coach. {context}
-    Analyze these metrics and give 3 short recovery tips.
-    Summary: {history_text}
+    Role: Running coach. {context}
+    Provide 3 short and practical recovery recommendations.
+
+    Recent history:
+    {history_text}
+
     Risk: {risk_percent}% ({risk_level})
     ACWR: {metrics.get('acwr_total_kms', 1.0):.2f}
     Monotony: {metrics.get('monotony_weekly_load', 0):.1f}
+
     Return JSON: {{"advice": ["tip1", "tip2", "tip3"]}}
     """
 
@@ -82,23 +90,26 @@ async def generate_recommendations(risk_percent, risk_level, metrics, history_te
             contents=prompt,
             config={'response_mime_type': 'application/json'}
         )
-        return json.loads(response.text).get("advice", ["Stay consistent", "Rest well", "Monitor pain"])
+        return json.loads(response.text).get(
+            "advice",
+            ["Stay consistent", "Rest well", "Monitor pain"]
+        )
     except Exception as e:
-        print("GEMINI ERROR:", str(e))
+        print(f"Gemini error: {e}")
         return ["Rest well", "Keep moving", "Watch for pain"]
 
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict_injury_risk(request: PredictionRequest):
     if trained_model is None:
-        raise HTTPException(status_code=500, detail="Model missing")
+        raise HTTPException(status_code=500, detail="Model not loaded")
 
     try:
-        # Convert input weeks → dataframe
+        # Build dataframe
         df = pd.DataFrame([w.dict() for w in request.training_history])
         df['Athlete ID'] = request.athlete_id
 
-        # Rename columns to match feature engineering
+        # Rename columns
         df = df.rename(columns={
             'total_kms': 'total kms',
             'max_km_one_day': 'max km one day',
@@ -118,8 +129,15 @@ async def predict_injury_risk(request: PredictionRequest):
             'date': 'Date'
         })
 
-        # Scale subjective scores (frontend sends 1–10)
-        scale_cols = ['avg exertion', 'max exertion', 'min exertion', 'avg recovery', 'avg training success']
+        # Scale subjective inputs
+        scale_cols = [
+            'avg exertion',
+            'max exertion',
+            'min exertion',
+            'avg recovery',
+            'avg training success'
+        ]
+
         for col in scale_cols:
             if col in df.columns and df[col].max() > 1.0:
                 df[col] = df[col] / 10.0
@@ -128,11 +146,11 @@ async def predict_injury_risk(request: PredictionRequest):
         engineered_df = engineer_all_features(df)
         latest = engineered_df.iloc[-1]
 
-        # If current week is incomplete early in week, fallback to previous
+        # Early-week fallback
         if datetime.datetime.now().weekday() <= 2 and latest['total kms'] == 0 and len(engineered_df) > 1:
             latest = engineered_df.iloc[-2]
 
-        # Prepare model input
+        # Feature vector
         features = latest[model_features].values.reshape(1, -1)
         feature_vector = np.nan_to_num(features, nan=0.0).astype(np.float32)
 
@@ -140,19 +158,45 @@ async def predict_injury_risk(request: PredictionRequest):
         risk_prob = float(trained_model.predict_proba(feature_vector)[0][1])
         risk_percent = risk_prob * 100
 
-        # Adjust for low training volume (ACWR unreliable here)
-        curr_kms = latest['total kms']
+        # Key indicators
+        curr_kms = float(latest['total kms'])
+        acwr_val = float(latest['acwr_total_kms'])
+        monotony_val = float(latest['monotony_weekly_load'])
+        gap_val = float(latest['exertion_recovery_gap_7d'])
+        hi_spike = float(latest['hi_load_spike_ratio'])
+        rest_def = float(latest['rest_day_deficiency_14d'])
 
-        if curr_kms < 10.0:
-            if curr_kms < 5.0:
-                risk_percent = min(risk_percent, 25.0)
-            else:
-                risk_percent = min(risk_percent, 35.0)
+        # Adjustments
+        if curr_kms < 5.0:
+            risk_percent = min(risk_percent, 25.0)
+        elif curr_kms < 10.0:
+            risk_percent = min(risk_percent, 35.0)
         else:
-            if latest.get('acwr_total_kms', 1.0) > 1.7:
+            if acwr_val > 1.7:
                 risk_percent = max(risk_percent, 55.0)
 
-        # Convert to label
+            risk_signals = sum([
+                acwr_val > 1.5,
+                monotony_val > 7.0,
+                gap_val > 0.3,
+                hi_spike > 1.5,
+                rest_def > 1.0,
+            ])
+
+            safe_signals = sum([
+                0.8 <= acwr_val <= 1.3,
+                monotony_val < 4.0,
+                gap_val < 0.0,
+            ])
+
+            if risk_signals >= 2:
+                risk_percent = max(risk_percent, 62.0)
+            elif safe_signals >= 2 and risk_signals == 0:
+                risk_percent = min(risk_percent, 38.0)
+            elif safe_signals >= 1 and risk_signals == 0:
+                risk_percent = min(risk_percent, 44.0)
+
+        # Risk level
         if risk_percent < 45:
             risk_level = "low"
         elif risk_percent < 60:
@@ -160,27 +204,32 @@ async def predict_injury_risk(request: PredictionRequest):
         else:
             risk_level = "high"
 
-        # Key metrics for UI
+        # Key factors
         factors = {
-            k: float(latest[k]) for k in [
-                'acwr_total_kms',
-                'monotony_weekly_load',
-                'rest_day_deficiency_14d'
-            ]
+            'acwr_total_kms': acwr_val,
+            'monotony_weekly_load': monotony_val,
+            'rest_day_deficiency_14d': rest_def,
         }
 
-        # Last 4 weeks summary (for AI)
+        # History text
         history_text = "\n".join([
             f"Week {i+1}: {w.total_kms}km"
             for i, w in enumerate(request.training_history[-4:])
         ])
 
+        # Recommendations
         recs = await generate_recommendations(
             round(risk_percent, 2),
             risk_level,
             factors,
             history_text,
             curr_kms
+        )
+
+        print(
+            f"Athlete {request.athlete_id}: {round(risk_percent, 2)}% ({risk_level}) | "
+            f"ACWR={acwr_val:.2f} Monotony={monotony_val:.2f} Gap={gap_val:.2f} "
+            f"HiSpike={hi_spike:.2f} RestDef={rest_def:.1f}"
         )
 
         return PredictionResponse(
@@ -191,5 +240,7 @@ async def predict_injury_risk(request: PredictionRequest):
         )
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Prediction error: {e}")
         raise HTTPException(status_code=500, detail="Prediction failed")
+
+
