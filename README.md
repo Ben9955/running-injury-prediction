@@ -76,6 +76,7 @@ The backend is deployed on AWS using a containerised setup with ECS Fargate. The
 
 ## 📂 Project Structure
 
+```text
 .
 ├── mobile-app/          # React Native (Expo)
 │   ├── src/
@@ -96,7 +97,7 @@ The backend is deployed on AWS using a containerised setup with ECS Fargate. The
 │
 └── landing-page/        # Static HTML (S3)
     └── index.html
-
+```
 ---
 
 ## 🚀 Tech Stack
