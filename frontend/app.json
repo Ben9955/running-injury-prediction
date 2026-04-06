@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Injury Prediction",
+    "slug": "injury-prediction-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1D3557"
+    },
+    "assetBundlePatterns": ["**/*"],
+
+
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.thesis.injuryprediction",
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "We need access to your running data.",
+        "NSHealthUpdateUsageDescription": "We need to read your workout data.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
+      "entitlements": {
+        "com.apple.developer.healthkit": true
+      }
+    },
+    
+    "android": {
+      "package": "com.thesis.injuryprediction"
+    },
+    "plugins": [
+  [
+    "@kingstinct/react-native-healthkit",
+    {
+      "NSHealthShareUsageDescription": "We need access to your running data for injury prediction.",
+      "NSHealthUpdateUsageDescription": "We need to read your workout data.",
+      "background": true
+    }
+  ]
+]
+  }
+}

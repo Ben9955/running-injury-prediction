@@ -1,0 +1,17 @@
+export const INITIAL_WEEK_DATA = {
+  totalKms: '',
+  maxKmOneDay: '',
+  totalKmHighIntensity: '',
+  totalKmZ5T1T2: '',
+  totalKmZ3Z4: '',
+  nrSessions: '',
+  nrRestDays: '',
+  avgExertion: '',
+  maxExertion: '',
+  minExertion: '',
+  avgRecovery: '',
+  avgTrainingSuccess: '',
+  nrIntervalDays: '',
+  maxKmOneDayWeek1: '',
+  maxKmOneDayWeek2: '',
+};
