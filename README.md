@@ -13,11 +13,11 @@ The system pulls training data from Apple Watch, calculates sports science metri
 
 **Tech:** React Native, FastAPI, XGBoost, AWS (ECS Fargate), Google Gemini
 
-[🌐 Live Landing Page](https://d1iit8mbrb3zms.cloudfront.net/)
+[Live Landing Page](https://d1iit8mbrb3zms.cloudfront.net/)
 
 ---
 
-## 🎯 What It Does
+## What It Does
 
 The app answers one question: **"Am I training too hard and about to get injured?"**
 
@@ -31,7 +31,7 @@ Then it returns a **risk percentage** along with actionable recommendations.
 
 ---
 
-## 📱 App Demo
+## App Demo
 
 <p align="center">
   <img src="assets/demo.gif" width="300" />
@@ -39,7 +39,7 @@ Then it returns a **risk percentage** along with actionable recommendations.
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 | Dashboard | Training Log | Analytics |
 |-----------|-------------|-----------|
@@ -49,7 +49,7 @@ Then it returns a **risk percentage** along with actionable recommendations.
 
 ---
 
-## 🏗 Architecture & Deployment
+## Architecture & Deployment
 
 The backend is deployed on AWS using a containerised setup with ECS Fargate. The system also uses event-driven components to handle dynamic IP updates and secure configuration.
 
@@ -74,7 +74,7 @@ The backend is deployed on AWS using a containerised setup with ECS Fargate. The
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 .
@@ -100,7 +100,7 @@ The backend is deployed on AWS using a containerised setup with ECS Fargate. The
 ```
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
 **Frontend:**
 - React Native 0.74 (Expo)
@@ -122,7 +122,7 @@ The backend is deployed on AWS using a containerised setup with ECS Fargate. The
 
 ---
 
-## 🧪 Machine Learning Details
+## Machine Learning Details
 
 **Model:** XGBoost Classifier  
 **Performance:** ROC-AUC 0.752 | PR-AUC 0.126 (expected due to heavy class imbalance)  
@@ -140,7 +140,7 @@ The backend is deployed on AWS using a containerised setup with ECS Fargate. The
 
 ---
 
-## 🛠️ Local Development
+## Local Development
 
 ### 1️⃣ Backend
 ```bash
@@ -169,18 +169,14 @@ Press `i` for iOS simulator (requires Xcode on Mac)
 
 This was my first time:
 - Deploying a real ML model to production (not just a Jupyter notebook)
-- Using AWS ECS + Docker for containerization
 - Integrating HealthKit (which has limited documentation in some areas)
 - Handling severe class imbalance (73:1 ratio)
-- Building a React Native app from scratch
-
-**Biggest challenge:** Getting HealthKit to reliably fetch heart rate data for past weeks. The library doesn't cache historical data well, so I had to implement weekly HR queries instead of per-workout queries.
 
 **Proud of:** The feature engineering pipeline. Going from "total km" to "7-day coefficient of variation in perceived exertion" based on actual sports science research (Gabbett 2016, Foster 1998) was satisfying.
 
 ---
 
-## 📊 Example API Request
+## Example API Request
 ```bash
 curl -X POST "http://injury-prediction.duckdns.org:8000/predict" \
   -H "Content-Type: application/json" \
@@ -220,7 +216,7 @@ curl -X POST "http://injury-prediction.duckdns.org:8000/predict" \
 
 ---
 
-## ⚠️ Known Limitations
+## Known Limitations
 
 - **No backend database** - all predictions stored locally on device
 - **iOS only** - HealthKit doesn't exist on Android
@@ -238,7 +234,7 @@ curl -X POST "http://injury-prediction.duckdns.org:8000/predict" \
 
 ---
 
-## 📝 License
+## License
 
 This is a university dissertation project (Middlesex University, 2026). Code is available for educational purposes.
 
